@@ -1,5 +1,3 @@
-from PyPDF2 import PdfFileReader
-
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
@@ -16,13 +14,23 @@ def escolherArquivo():
     else:
         print("Nenhum arquivo selecionado")
         
-    
+import fitz
+def get_pdf_content_lines(pdf_path):
+    doc = fitz.open(pdf_path)
 
-def extract_information(pdf_path):
-    with open(pdf_path, 'rb') as f:
-        pdf = PdfFileReader(f)
+    for page_number in range(doc.page_count):
+        page = doc[page_number]
+        text = page.get_text("text")
+        
+        # Splitting the text into lines and printing each line
+        lines = text.split('\n')
+        for line_number, line in enumerate(lines, 1):
+            if('PIX RECEB.OUTRA IF' in line):
+                print(f"Line {line_number}: {line}")
 
+
+        
 if __name__ == '__main__':
 
     path = escolherArquivo()
-    extract_information(path)
+    get_pdf_content_lines(path)
