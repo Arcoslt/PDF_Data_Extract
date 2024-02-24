@@ -15,22 +15,31 @@ def escolherArquivo():
         print("Nenhum arquivo selecionado")
         
 import fitz
-def get_pdf_content_lines(pdf_path):
+import pandas as pd
+
+def extract_text_from_pdf(pdf_path):
+    data = {'Page': [], 'Line': [], 'Text': []}
+
     doc = fitz.open(pdf_path)
 
     for page_number in range(doc.page_count):
         page = doc[page_number]
         text = page.get_text("text")
         
-        # Splitting the text into lines and printing each line
+        # Splitting the text into lines and storing in DataFrame
         lines = text.split('\n')
         for line_number, line in enumerate(lines, 1):
-            if('PIX RECEB.OUTRA IF' in line):
-                print(f"Line {line_number}: {line}")
+            data['Page'].append(page_number + 1)
+            data['Line'].append(line_number)
+            data['Text'].append(line)
 
+    doc.close()
 
-        
+    df = pd.DataFrame(data)
+    return df
+
 if __name__ == '__main__':
 
     path = escolherArquivo()
-    get_pdf_content_lines(path)
+    df = extract_text_from_pdf(path)
+    print(df.to_string(index=False))
